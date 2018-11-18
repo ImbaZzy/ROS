@@ -1,0 +1,34 @@
+<launch> 
+	<param name="/use_sim_time" value="false" />
+	<arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find mbot_description)/urdf/mbot.xacro'"  />
+	<arg name="gui" default="true" />
+
+	
+	<param name="robot_description" command="$(arg urdf_file)" />
+	
+	
+	
+	<!-- 设置GUI参数，显示关节控制插件 -->
+	<param name="use_gui" value="$(arg gui)"/>
+
+
+	<node name="arbotix" pkg="arbotix_python" type="arbotix_driver" output="screen">
+		<rosparam file="$(find mbot_description)/config/fake_mbot_arbotix.yaml" command="load" />
+		<param name="sim" value="true" />
+	</node>
+	<!-- 运行JOINT——STATE——PUBLISHER节点，发布机器人关节状态 -->
+	
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+  
+	<!-- 运行ROBOT——STATE——PUBLISHER节点，发布tf -->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+		<param name="publish_frequency" type="double" value="20.0" />
+	</node>
+
+	<!-- 运行rviz -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mbot_description)/config/mbot.rviz" required="true" />
+	
+
+
+
+</launch>
